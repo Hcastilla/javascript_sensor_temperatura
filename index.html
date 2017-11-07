@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Estacion Meteorologica </title>
+	<link rel="stylesheet" href="/static/node_modules/materialize-css/dist/css/materialize.min.css">
+	<style>
+		#table{
+			max-height: 380px;
+			overflow: auto;
+			overflow-x: hidden;
+		}
+
+		#actual{
+			font-size: 1.2em;
+		}
+	</style>
+</head>
+
+<body class="grey lighten-4">
+	<nav class="blue">
+		<div class="row">
+			<div class="col s12">
+				<h4 class="center-align">Estación Metereologica</h4>
+			</div>
+		</div>
+	</nav>
+
+	<div class="container" id="app">
+
+		<div class="row">
+			<div class="col s12 m6 center">
+				<div class="white card-panel">
+						<h5 id="actual">
+							<b>Temperatura Actual:</b> 
+							<span id="actual">{{temperature.degrees}}°</span>
+						</h5>
+				</div>
+			</div>
+
+			<div class="col s12 m6">
+					<div class="white card-panel">
+						<div class="row">
+							<div class="col s4 center"><b>Fecha</b></div>
+							<div class="col s4 center"><b>Hora</b></div>
+							<div class="col s4 center"><b>Grados</b></div>
+						</div>
+						<hr>
+						<div class="row">
+								<div class="col s12">
+									<div id="table">
+											<div class="row" v-for="temp in temperatures">
+												<div class="col s4 center">{{temp.date}}</div>
+												<div class="col s4 center">{{temp.time}}</div>
+												<div class="col s4 center">{{temp.degrees}}°</div>
+											</div>
+									</div>
+								</div>
+							</div>
+					</div>
+	
+				</div>
+		</div>
+	</div>
+</body>
+</html>
+
+<script src="/static/node_modules/socket.io-client/dist/socket.io.js"></script>
+<script src="/static/node_modules/vue/dist/vue.min.js"></script>
+<script defer>
+	var socket = io.connect('localhost:7000');
+
+	new Vue({
+		el:"#app",
+		data:{
+			temperature : {date: null, degrees:null, time:null},
+			temperatures: []
+		},
+		mounted()
+		{
+			const self = this;
+			socket.on('temperature', function(temperature){
+				self.temperature = temperature;
+			});
+			socket.on('temperatures', function(temperatures){
+				self.temperatures = temperatures;
+			});
+		}
+	});
+</script>
